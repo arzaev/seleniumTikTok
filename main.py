@@ -55,6 +55,7 @@ class MainForm(QWidget, gui_template.Ui_Form):
             if action == 'start':
                 email = self.model_table.item(id, 1).text()
                 password = self.model_table.item(id, 2).text()
+                self.model_table.setItem(id, 5, QStandardItem('started'))
                 data = action_start.Data(action, id, email, password)
                 self.data_list.append({'id': id, 'data': data})
                 action_start.thread_action(data)
