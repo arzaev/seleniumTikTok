@@ -9,8 +9,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-data/accounts.txt
-data/parsing.txt
+data/
 .Python
 .idea
 build/
