@@ -1,10 +1,11 @@
 import sys
 from model import QTable_S
 from gui import TableView_S
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 from gui import gui_template
 from PyQt5.QtGui import QStandardItem
 from scripts import action_start
+import os
 
 
 class MainForm(QWidget, gui_template.Ui_Form):
@@ -23,7 +24,7 @@ class MainForm(QWidget, gui_template.Ui_Form):
         self.btn_start.clicked.connect(self.start)
 
         """ add actions for comboBox here"""
-        self.comboBox.addItems(['start', 'get main page'])
+        self.comboBox.addItems(['start', 'get main page', 'follow'])
 
         """ list with objects from table"""
         self.data_list = []
@@ -33,9 +34,9 @@ class MainForm(QWidget, gui_template.Ui_Form):
             accounts = f.read().split('\n')
         for i, acc in enumerate(accounts):
             self.model_table.setItem(i, 0, QStandardItem(str(i)))
-            self.model_table.setItem(i, 1, QStandardItem(acc.split(':')[0]))
-            self.model_table.setItem(i, 2, QStandardItem(acc.split(':')[1]))
-            self.model_table.setItem(i, 3, QStandardItem(acc.split(':')[2]))
+            self.model_table.setItem(i, 1, QStandardItem(acc.split(';')[0]))
+            self.model_table.setItem(i, 2, QStandardItem(acc.split(';')[1]))
+            self.model_table.setItem(i, 3, QStandardItem(acc.split(';')[2]))
 
     def return_select_rows_and_action(self):
         action = self.comboBox.currentText()
@@ -55,10 +56,27 @@ class MainForm(QWidget, gui_template.Ui_Form):
             if action == 'start':
                 email = self.model_table.item(id, 1).text()
                 password = self.model_table.item(id, 2).text()
+                proxy = self.model_table.item(id, 3).text()
                 self.model_table.setItem(id, 5, QStandardItem('started'))
-                data = action_start.Data(action, id, email, password)
+                data = action_start.Data(action, id, email, password, proxy)
                 self.data_list.append({'id': id, 'data': data})
                 action_start.thread_action(data)
+            elif action == 'follow':
+                parsing_file_path = QFileDialog.getOpenFileName(
+                    parent=self,
+                    caption='Select parsing file',
+                    directory=os.getcwd(),
+                )[0]
+                with open(parsing_file_path, 'r') as f:
+                    parsing_file = f.read().split('\n')
+                n = len(parsing_file) // 2
+                list_of_lists_parsing = [parsing_file[i:i + n] for i in range(0, len(parsing_file), n)]
+                count = 0
+                for i in self.data_list:
+                    if i['id'] == id:
+                        i['data'].action = action
+                        i['data'].parsing_list = list_of_lists_parsing[count]
+                        count += 1
             else:
                 for i in self.data_list:
                     if i['id'] == id:
@@ -68,6 +86,6 @@ class MainForm(QWidget, gui_template.Ui_Form):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = MainForm()
-    w.setWindowTitle('Station')
+    w.setWindowTitle('StationTikTok')
     w.show()
     sys.exit(app.exec_())
