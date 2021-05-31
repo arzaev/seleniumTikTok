@@ -19,7 +19,7 @@ class Data:
         self.tiktok.get_main_page()
 
     def follow(self):
-        self.tiktok.follow(self.parsing_list)
+        self.tiktok.follow(self.parsing_list, self.id)
 
 
 def some_function(data):

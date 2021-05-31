@@ -52,6 +52,19 @@ class MainForm(QWidget, gui_template.Ui_Form):
         bar = self.return_select_rows_and_action()
         id_list = bar[0]
         action = bar[1]
+        if action == 'follow':
+            parsing_file_path = QFileDialog.getOpenFileName(
+                parent=self,
+                caption='Select parsing file',
+                directory=os.getcwd(),
+            )[0]
+            with open(parsing_file_path, 'r', encoding='utf-8') as f:
+                parsing_file = f.read().split('\n')
+            n = len(parsing_file) // len(id_list)
+            list_of_lists_parsing = [parsing_file[i:i + n] for i in range(0, len(parsing_file), n)]
+            for i in list_of_lists_parsing:
+                print(i)
+        count_parsing_list = 0
         for id in id_list:
             if action == 'start':
                 email = self.model_table.item(id, 1).text()
@@ -62,21 +75,11 @@ class MainForm(QWidget, gui_template.Ui_Form):
                 self.data_list.append({'id': id, 'data': data})
                 action_start.thread_action(data)
             elif action == 'follow':
-                parsing_file_path = QFileDialog.getOpenFileName(
-                    parent=self,
-                    caption='Select parsing file',
-                    directory=os.getcwd(),
-                )[0]
-                with open(parsing_file_path, 'r') as f:
-                    parsing_file = f.read().split('\n')
-                n = len(parsing_file) // 2
-                list_of_lists_parsing = [parsing_file[i:i + n] for i in range(0, len(parsing_file), n)]
-                count = 0
                 for i in self.data_list:
                     if i['id'] == id:
                         i['data'].action = action
-                        i['data'].parsing_list = list_of_lists_parsing[count]
-                        count += 1
+                        i['data'].parsing_list = list_of_lists_parsing[count_parsing_list]
+                        count_parsing_list += 1
             else:
                 for i in self.data_list:
                     if i['id'] == id:

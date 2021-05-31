@@ -5,10 +5,11 @@ import time
 
 class TikTokSelenium:
     def __init__(self, proxy):
-        host = proxy.split(':')[0]
-        port = proxy.split(':')[1]
         chrome_options = uc.ChromeOptions()
-        chrome_options.add_argument(f'--proxy-server=http://{host}:{port}')
+        if ':' in proxy:
+            host = proxy.split(':')[0]
+            port = proxy.split(':')[1]
+            chrome_options.add_argument(f'--proxy-server=http://{host}:{port}')
         self.driver = uc.Chrome(options=chrome_options)
 
     def start(self, email, password):
@@ -21,7 +22,9 @@ class TikTokSelenium:
     def get_main_page(self):
         self.driver.get('https://www.tiktok.com/')
 
-    def follow(self, parsing_list):
+    def follow(self, parsing_list, _id):
+        print(len(parsing_list))
+        count = 0
         for user in parsing_list:
             try:
                 self.driver.get("https://www.tiktok.com/@{}?".format(user))
@@ -29,6 +32,8 @@ class TikTokSelenium:
                 self.driver.find_element_by_xpath(
                     '//*[@id="main"]/div[2]/div[2]/div/header/div[1]/div[2]/div/div[1]/button').click()
                 time.sleep(1)
+                count += 1
+                print('_id {}: {}'.format(str(_id), str(count)))
             except Exception as error:
                 print(error)
                 print('error: ' + user)
