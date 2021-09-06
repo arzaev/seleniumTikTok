@@ -31,12 +31,14 @@ class MainForm(QWidget, gui_template.Ui_Form):
 
     def add_data(self):
         with open('data/accounts.txt', 'r') as f:
-            accounts = f.read().split('\n')
+            accounts = f.readlines()
+        with open('data/proxy.txt', 'r') as f:
+            proxy = f.readlines()
         for i, acc in enumerate(accounts):
             self.model_table.setItem(i, 0, QStandardItem(str(i)))
-            self.model_table.setItem(i, 1, QStandardItem(acc.split(';')[0]))
-            self.model_table.setItem(i, 2, QStandardItem(acc.split(';')[1]))
-            self.model_table.setItem(i, 3, QStandardItem(acc.split(';')[2]))
+            self.model_table.setItem(i, 1, QStandardItem(acc.split(':')[0]))
+            self.model_table.setItem(i, 2, QStandardItem(acc.split(':')[1]))
+            self.model_table.setItem(i, 3, QStandardItem(proxy[i]))
 
     def return_select_rows_and_action(self):
         action = self.comboBox.currentText()
